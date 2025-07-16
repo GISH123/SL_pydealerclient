@@ -1,0 +1,25 @@
+@startuml
+actor "remoteDealerClient 10.146.11.75" as DC
+box "pydealerMain [main.pyw]" #LightBlue
+    participant DealerClient as DL /' [dealerclient.py] '/
+    participant VideoManager as VM /' [videomanager.py] '/
+    participant Detector as D /' [detector.py] '/
+    participant ImageSaver as IS /' [imagesaver.py] '/
+    participant DataManager as DM /' [datamanager.py] '/
+end box
+
+DC -> DL: Establish connection (IP 10.146.11.75)
+DL -> DC: Confirm connection
+
+DC -> DL: Request card detection
+DL -> VM: Trigger video processing
+
+VM -> D: Send frame for card detection
+D -> VM: Detected card info
+
+VM -> IS: Save detected card info
+IS -> DM: Forward card info for saving
+DM -> IS: Confirm card info saved
+
+DL -> DC: Transmit card info to remote client
+@enduml

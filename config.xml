@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<config>
+    <common vid="ph_bac" freq="3" onelabel="1" detecttimes="5" saveimagescore="0.85" />
+    <dealer id="1001" host="10.146.11.75" port="2331" />
+    <ftp host="10.146.11.141" port="21" password="123456789" user="JK" />
+    <save folder="D:\20250407_ph_bac" autoUpload="1" />
+</config>

@@ -1,0 +1,40 @@
+
+requirement:
+近距离视频(识别用摄像机)中截取一张最合适的jpg图，并上传到FTP server。
+
+design:
+1. add field:snapshot_upload_addr into config.xml
+<common vid="B004" freq="3" onelabel="1" score="0.99" detecttimes="5" saveimagescore="0.85" snapshot_upload_addr="http://xxxx"/>
+2. put gmcode on snapshot image.
+3. kick off a new thread to upload snapshot image to snapshot_upload_addr.
+
+test-env:
+video input: rtmp://g01.jsyihuo.com/tz04/8-4tx for testing purpose.
+new domain addr: rtmp://g01.gyzgyy.cn/tz04/8-4tx
+
+FTP-server:
+内网地址：uatftp.ms359.live:2121
+外网地址：uatimg.ms359.live:10088
+account: tx / 495992ce9776a80947c01ae200d4a1d4
+
+图片服务器地址：
+http://uatimg.ms359.live:10088/img/<gmCode>.jpg
+demo-image: http://uatimg.ms359.live:10088/img/GB004228091FW.jpg
+
+2022/9/29
+2022-08-24 16:15:41.055 [INFO][MainThread] onStartPredict, gmcode=b'GB00622824005\x00', gmstate=2
+2022-08-24 16:16:34.804 [INFO][MainThread] onStopPredict, gmcode=b'GB00622824005\x00', gmstate=0
+
+2022-10-31 13:48:27.248 [INFO][MainThread] SaveFinalResult, gmcode=(b'GB00422A3101S\x00',), len(scanmap)=4  //保存结果
+2022-10-31 13:48:32.237 [INFO][MainThread] datamanager stopPredict, gmcode=, cardcount=0, gmstate=0 //按下确认
+2022-10-31 13:48:56.508 [INFO][MainThread] onStartPredict, gmcode=b'GB00422A3101T\x00', gmstate=2   //开始翻牌时才生成新一个局号
+2022-10-31 13:48:56.714282 [INFO][  APP][00001][upload.go:233]FTP: 192.168.22.40:2121 connected.    //上传截图完成
+	def SaveFinalResult(self, gmcode):
+		logger.info('SaveFinalResult, gmcode=%s, len(scanmap)=%d' % (gmcode, len(self.scanmapcard)))
+		self.savetocsv()
+		self.savetocsvfinaresult()
+		self.clearCardMap(gmcode)
+
+
+游戏开始局号：GB00422A310O7，结束局号：GB00422B010PT
+能计算出玩了多少局吗

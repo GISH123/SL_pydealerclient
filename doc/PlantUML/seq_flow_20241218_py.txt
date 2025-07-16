@@ -1,0 +1,42 @@
+@startuml
+actor "remoteDealerClient 10.146.11.75" as DC
+
+box "Card Detection Adding to ResultList and return to remote Dealer 發牌邏輯" 
+participant DataManager as DM /' [DataManager.py] '/
+participant CardList as CL /' [CardList.py] '/
+end box
+
+== DataMgrInstance().addResultlist,\n 辨識完後，將卡牌加入六個牌框，作為回傳荷官端的最終結果之候選 ==
+DM -> DM: addResultlistNoLock(gmcode, resultlist) /' Add results without lock '/
+
+loop for result in resultlist(result = CardInfo) 注意:當前版本一個resultlist只會有一個result(detector的單次預測結果，有花色跟牌值)
+DM -> DM: addCardNolock() 
+DM -> DM: cardlist_box = DataManager.mapcard.get(index)
+note right
+DataManager.mapcard = 
+{1: cardlist_box1, 2: cardlist_box2, ...., 6: cardlist_box6} key 表 第幾牌框(index)
+end note
+alt DataManager.cardlist_box為空 (Scenario 1)
+    DM -> CL: cardlist_box.addcardEx(card)
+    DM -> DM: DataManager.mapcard[index] = cardlist_box
+else DataManager.cardlist_box有值 (Scenario 2)
+    DM -> CL: cardlist_box.addcardEx(card)
+    CL -> CL: cardlist_box.cardlist = cardlist_box.indexcardmap.get(card.dealer_classid)
+      alt (Scenario 1) cardlist_box.cardlist為空,該classid沒有預測到過
+      CL -> CL: 新增cardlist_box.cardlist，在此cardlist新增此張卡牌\n，並以classid當key去新增到cardlist_box.indexcardmap
+      else (Scenario 2) cardlist_box.cardlist有值,該classid已存在一張牌
+      CL -> CL: cardlist_box.cardlist.append(card) 該cardlist新增一張卡牌
+      CL -> CL: <color:red>cardlist_box.cardlist.sort(key=lambda card: card.score, reverse=True)\n<color:red>每加一次牌就做排序，信心分數由高到低
+      end
+        note right
+        cardlist_box.indexcardmap = {classid : list of CardInfos},
+        key為dealer_classid, value為一個單純的list裡面裝預測的牌CardInfos 
+        end note
+end
+DM -> DM:if cardlist_box.CardNum >= cfg.detecttimes \n當一個牌框的總牌數超過detecttimes時，進入挑牌回傳邏輯check_resultEx
+== check_resultEx(), 根據現有的牌框之預測結果, 依挑選邏輯, 選最好的牌回傳荷官端 ==
+DM -> DM:resultlist = DataManager.getsendResultNolock(index, cardlist_box.CardNum)
+DM -> DM:if cardlist_box.CardNum >= cfg.detecttimes and cardlist_box.getIsdispatch() == False:
+DM -> CL:result = cardlist_box.getSendResultList(cfg.detecttimes)
+CL -> CL: <color:red>for (key,cardlist) in cardlist_box.indexcardmap.items(): \n<color:red>if len(cardlist) >= detecttimes: \n<color:red>return cardlist[0] \n<color:red>遍歷整個cardlist_box, 只要有一個classid的牌數超過detecttimes則回傳該牌框第一張牌(最高分)
+@enduml

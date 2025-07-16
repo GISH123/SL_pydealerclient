@@ -1,0 +1,54 @@
+@startuml
+actor "remoteDealerClient 10.146.11.75" as DC
+
+box "Card Detection Adding to ResultList and return to remote Dealer 發牌邏輯" 
+participant CardManager as CM /' [CardManager.cpp] '/
+participant CardList as CL /' [CardList.cpp] '/
+participant CardInfo as CI /' [CardInfo.cpp] '/
+end box
+
+== addResultList, 辨識完後，將卡牌加入六個牌框，作為回傳荷官端的最終結果之候選 ==
+loop uList (a uList means a result from detector, usually len=1) 一般為一個卡牌的結果 /' for (auto it = uList.begin(); it != uList.end(); ++it) '/
+CM -> CM: CardManager.uItem = CardManager.m_uMap.find(ulist.index)\n uItem為一個牌框的東西
+
+note right
+CardManager.m_uMap = {card.index : CardList}, key對應六個牌框, value對應6個牌框的容器CardList 
+end note
+
+CM -> CM: CardList.addCard(CardManager.uItem)
+
+alt CardManager.uItem為空 (Scenario 1)
+    CM -> CL: CardList uListItem; uListItem.addCard(*it); m_uMap[it->m_nInx] = uListItem; \n新增Cardlist uListItem 做為此牌框的容器
+else CardManager.uItem有值 (Scenario 2)
+    CM -> CM: uItem->second.addCard(*it); 在該index上的CardManager.CardList新增卡牌
+    CM -> CL: 並於該預測的classid上(uListItem.m_uMap)去加牌
+end
+
+note right
+CardList.m_uMap = {classid : list of CardInfos}, key為m_nCardVal, value為一個單純的vector裡面裝預測的牌CardInfos 
+end note
+
+CL -> CL: CardList.addCard(CardInfo uCard), CardList.uItem = CardList.m_uMap.find(uCard.m_nCardVal);
+alt (Scenario 1) CardList.uItem為空,該classid沒有預測到
+CL -> CL: 新增CardList.uList，在此uList新增此張卡牌，並以classid當key去新增到CardList.m_uMap
+else (Scenario 2) CardList.uItem有值,該classid已存在一張牌
+CL -> CL: 在此uItem(m_uMap對應的classid之CardInfos)新增卡牌
+end
+
+CL -> CM: if (uItem->second.GetNum() >= m_pConfig->m_uBase.m_DetecTime)\n最後將該牌框上，現在有的牌框數量做判斷
+CM -> CM: 當牌框數量超過detecttimes，則進入挑牌回傳邏輯CheckResultEx()
+end
+
+== CheckResultEx(), 根據現有的牌框之預測結果，做挑選邏輯，選最好的牌回傳荷官端 ==
+CM -> CM: 確認此牌框是否已發牌，已發牌就不做事
+alt (Scenario 1) nCount牌框的牌數量 >= nCount_GoodSamples==5
+CM -> CL: getbestcard(), 取眾數邏輯，以分數為基底去挑一張最適合回傳荷官端的牌，詳情看code，裡面有依信心分數排序
+else (Scenario 2) nCount >= detectimes 且為3或4
+CM -> CM: getSendResultList，取牌框第二張卡，<color:teal>我的理解是這邊沒有排序?(所以不會取第二高分?)
+else (Scenario 3) 以上都沒發生的情況，且ncount介於2和5之間
+CM -> CM: 2024.12.18 以現版本 還是取眾數getbestcard(), mincount設為2代表同一classid至少要有兩張牌
+
+end
+
+
+@enduml

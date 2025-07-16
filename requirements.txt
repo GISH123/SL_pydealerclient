@@ -1,0 +1,11 @@
+# ========= requirements.txt =========
+numpy==1.26.4
+opencv-python==4.9.0.80          # cv2
+scikit-image==0.22.0             # compare_ssim 等
+scipy==1.11.4                    # scikit-image 依賴
+twisted==23.10.0                 # Reactor / LoopingCall
+tensorflow-gpu==2.10.1           
+pyinstaller==6.5.0               # 打包用（僅開發者安裝）
+huggingface-hub==0.24.1         
+pandas==2.2.3   
+# ====================================

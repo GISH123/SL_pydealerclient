@@ -1,0 +1,54 @@
+# config
+read_base_config, read_video_list, read_position, read_scoreshold
+AppConfig('./config.xml', './models/videolist.xml','./models/score-threshold.xml')
+    ## <common vid="B006" freq="3" onelabel="1" score="0.99" detecttimes="5" saveimagescore="0.85"/>
+    vid: 视频ID
+    freq: 检测FPS
+    onelabel: 1:预测整张牌  0:分别预测花色和牌值
+    score:识别成功的最低分数(比如0.9代表超过0.9才能作为识别成功的依据)
+    detecttimes 每张牌最小预测次数. 多次预测以提高准确度。
+    saveimagescore: 保存image的最低分数值。
+
+    ## <dnn model="./models/model.pb" />
+    训练后输出的模型文件(pb)
+
+    ## <video vid="B001" gametype="BAC" stream="0" position_file="./models/cap0_pos.xml" width="1920" height="1080" />
+    需要识别的视频信息：vid，game type, stream addr, pos file, input width/height.
+    stream="0" is capture id. if config to rtmp://g01.jsyihuo.com/tz04/8-4tx, it is a networking stream uri.
+
+    # each card has a threshold like below:
+   	<puke>
+		<title>club_ace</title>
+		<index>1</index>
+		<threshold>0.99</threshold>
+	</puke>
+
+
+# software structure
+Detector(), DealerClient(), ImageSaver(), VideoManager()
+VideoManager is the video live pipeline.
+
+# software flowchart
+
+
+
+# test
+video input: rtmp://g01.jsyihuo.com/tz04/8-4tx for testing purpose.
+域名过期，换为--> rtmp://g01.gyzgyy.cn/tz04/8-4tx
+
+
+请现场协助我们进行识别程序的测试。
+单独部署一台测试用的识别电脑，硬件/操作系统跟B04生产环境识别用机一样。
+我们的识别程序在增加截图&上传功能后，重新打包发行。通过内网发给现场，由现场帮助测试确认是否运行正常，上传FTP正常。
+修改一下识别软件目录下models\videolist.xml
+    stream="0"改为stream="rtmp://g01.gyzgyy.cn/tz04/8-4tx"
+teamviewer id: 1040425196 , pwd: ummvxv35
+换一台电脑测试通过。
+Techzone_监控值班 (tzcctv)  · i Talk 2022/10/06 16:23:10
+1157011002
+Techzone_监控值班 (tzcctv)  · i Talk 2022/10/06 16:23:20
+fq86z351
+config.xml config as:
+<save folder="Z:" autoUpload="0"/>   //for 共享目录方式
+config.xml config as:
+<save folder="./predict_images" autoUpload="1"/>   //for FTP上传方式

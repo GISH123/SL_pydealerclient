@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<config>
+  <!--ģ�������ļ�-->
+  <dnn model="./models/saved_model"/>
+
+  <videolist>
+    <video vid="B022t" gametype="NN"  stream="./models/video_NN.mp4" position_file="./models/cap0_pos_testdesk_NN.xml" width="1920" height="1080"/>
+    <video vid="B001t" gametype="BAC" stream="rtmp://uatg01.gyzgyy.cn/tz131/8-131" position_file="./models/cap0_pos_testdesk_BAC.xml" width="1920" height="1080"/>
+    <video vid="B004t" gametype="BAC"  stream="./models/video_BAC.mp4" position_file="./models/cap0_pos_testdesk_BAC.xml" width="1920" height="1080"/>
+    <video vid="B004" gametype="BAC" stream="rtmp://g01.zhalemon.xyz/tz04/8-4tx" position_file="./models/cap0_pos_B04.xml" width="1920" height="1080"/>
+	<video vid="BINGO" gametype="BAC" stream="rtmp://pull-b.livetelebet.com/live/ball" position_file="./models/cap0_pos_BINGO.xml" width="640" height="360"/>
+	<video vid="BINGOt" gametype="BAC" stream="./models/video_BINGO.mp4" position_file="./models/cap0_pos_BINGO.xml" width="640" height="360"/>
+	<video vid="S001t" gametype="BAC" stream="./models/video_spain.avi" position_file="./models/cap0_pos_testdesk_SPAIN.xml" width="1280" height="720"/>
+	<!-- <video vid="tilt_angle" gametype="BAC" stream="rtmp://10.146.11.92:1935/dev/uk" position_file="./models/cap0_pos_tilt_angle.xml" width="1280" height="720"/> -->
+	<video vid="tilt_angle" gametype="BAC" stream="rtmp://10.146.11.92:1935/dev/uk" position_file="./models/uk_6_cards_annotations.xml" width="1280" height="720"/>
+	<!-- <video vid="tilt_angle" gametype="BAC" stream="./models/uk_100m.mp4" position_file="./models/cap0_pos_tilt_angle.xml" width="1280" height="720"/> -->
+	<!-- <video vid="tilt_angle" gametype="BAC" stream="./models/uk_59m.mp4" position_file="./models/cap0_pos_tilt_angle.xml" width="1280" height="720"/> -->
+	<video vid="uk_35m_front_valid" gametype="BAC"  stream="rtmp://10.146.11.92:1935/abcd/gish" position_file="./models/uk_35m_front_valid.xml" width="1920" height="1080"/>
+  <video vid="uk_6_cards" gametype="BAC"  stream="rtmp://10.146.11.92:1935/abcd/gish" position_file="./models/uk_6_cards_annotations.xml" width="1920" height="1080"/>
+  <video vid="ph_bac" gametype="BAC"  stream="./models/ph_bac.mp4" position_file="./models/ph_bac_pretrain_1.xml" width="3840" height="2160"/>
+  </videolist>
+</config>

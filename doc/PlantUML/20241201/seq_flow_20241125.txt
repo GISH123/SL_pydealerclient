@@ -1,0 +1,74 @@
+@startuml
+actor "remoteDealerClient 10.146.11.75" as DC
+
+box "DealerClient System" /' LightBlue '/
+participant DealerClient as DL /' [dealerclient.py] '/
+participant DealerFactory as DF /' [dealerfactory.py] '/
+participant DealerProtocol as DP /' [dealerprotocol.py] '/
+end box
+
+box "Video Management" /' LightGreen '/
+participant VideoManager as VM /' [videomanager.py] '/
+end box
+
+box "Detection System" /' LightYellow '/
+participant Detector as DET /' [detector.py] '/
+end box
+
+box "Image Saving" /' LightOrange '/
+participant ImageSaver as IS /' [imagesaver.py] '/
+end box
+
+box "Data Management" /' LightCyan '/
+participant DataManager as DM /' [datamanager.py] '/
+end box
+
+== Connection Establishment ==
+DC -> DL: connect(host, port)
+DL -> DF: DealerFactory() /' Create factory instance '/
+DF -> DP: buildProtocol() /' Create protocol instance '/
+
+== Login and Session Initiation ==
+DP -> DC: send cardmsg.PK_Login() to remote
+DC -> DP: remote sends login message
+DP -> DL: onLoginRet() /' Process login result '/
+
+== Start Card Detection ==
+DC -> DL: send StartPredict封包 to dealerClient /' Request to start detection '/
+DL -> DM: onStartPredict(gmcode,gmstate) dealerClient處理封包訊息後丟入DataManagerInstance
+DM -> VM: self.predictFlag = True /' Set predictFlag to True '/
+
+== Frame Processing and Prediction ==
+loop Until End of Stream
+VM -> VM: retrieve frame from stream 拉流影片 /' Capture frame from video stream '/
+VM -> VM: process_frame() if DataMgrInstance().predictFlag is True/' Start card prediction on the frame '/
+VM -> DET: detector.do_predict_one_label() /' Use detector instance to predict frame '/
+DET -> VM: predict_suits, predict_cardval, score /' return card suits and value, and its confidence score '/
+VM -> VM: send_prediction() self.resultlist.append(result) 儲存預測結果準備回傳 /' 注意，以我目前的程式，基本上resultlist只會有一個result，因當predictFlag=True時，獲取每個frame都會清空resultlist一次 '/
+VM -> VM: send_prediction() save prediction img(存小圖) if save_predictions(我自訂義的) is True
+VM -> DM: DataMgrInstance().addResultlist() /' prediction added to resultlist, waiting to be responded to remote'/
+VM -> VM: display_frame() 這邊是顯示在UI的邏輯，包含要偵測的框格，現在要偵測的框格、當前gmcode等/' display current detect situation to the UI window '/
+VM -> VM: save_full_img() 存大圖 if is_card_detected(我自訂義的) is True, keep overwriting until last card detected /' save_full_img if card is detected. '/
+end
+
+== DataManager回傳結果給遠端荷官端的處理邏輯、發牌邏輯 DataMgrInstance().addResultlist() ==
+alt 發牌邏輯
+DM -> DM: addResultlistNoLock(gmcode, resultlist) /' Add results without lock '/
+
+loop for result in resultlist(result = CardInfo) 注意:當前版本一個resultlist只會有一個result(detector的單次預測結果，有花色跟牌值)
+DM -> DM: addCardNolock() /' 將CardInfo存成Cardlist_box形式 , 使用mapcard來辨認是第幾張牌, index 表 第幾張牌 mapcard = {1: cardlist_box1, 2: cardlist_box2, 3:cardlist_box3, ...., 6: cardlist_box6} '/
+
+DM -> DM: cardlist.addcardEx(card) 将每个位置的牌按索引分类添加至列表，最多保留10张，參考cardlist.py的註解(我另外加上) 
+DM -> DM: 20241125 cardlist.sort() 每次增加新的card進cardlist後會確切的sort一遍，舊code不會sort
+DM -> DM: if cardlist.CardNum >= cfg.detecttimes, then check_resultEx() /' 當該牌位的預測牌數 超過detecttimes時 '/
+DM -> DM: check_resultEx() -> resultlist = self.getsendResultNolock(index, count) 判斷發牌，參考datamanager.py /' getsendResultNolock 當 addCardEx超過次數時(默認10次，代表該牌位儲存的預測結果超過10張時 '/
+DM -> DM: getsendResultNolock if cardlist_box.CardNum >= 10(目前應不會執行到這個邏輯) : 如果該index牌框格已經加入超過十張牌，且還未發牌，就按照算法取牌值分数加起来最高的牌
+DM -> DM: getsendResultNolock if cardlist_box.CardNum >= cfg.detecttimes and <= 9, result = cardlist_box.getSendResultList(cfg.detecttimes), resultlist.append(result), setIsDispatch(True), return resultlist
+DM -> DM: 因已修正排序邏輯，cardlist_box.getSendResultList(cfg.detecttimes)應只拿到該index牌框格裡面分數最高的牌，回傳resultlist=[cardInfo(分數最高的牌)]
+end
+
+DM -> DL: self.senddata(resultlist) 判斷發牌的結果如果有結果，則藉由DealerClient.py傳到remote荷官端 /' Send processed results back to DealerClient '/
+DL -> DC: dealerclient.py sendPredictResult(resultlist) 藉由DealerClient傳到remote荷官端
+end
+
+@enduml

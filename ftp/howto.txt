@@ -1,0 +1,9 @@
+1. configure conf/app.ini correctly.
+2. run as follows:
+E:\goprj\workspace\screenshot\bin>ImageUploader.exe GB004228120CD.jpg E:\goprj\workspace\screenshot\bin\predict_image\2022-08-15\GB004228120CD.jpg
+2022-09-29 15:11:17.761162 [INFO][  APP][00001][main.go:42]Load app.ini successfully.
+2022-09-29 15:11:17.761162 [INFO][  APP][00001][main.go:46]Ftp Upload Path= E:\\goprj\\workspace\\screenshot\\bin\\predict_image, interval= 1 s, protocol= ftp
+2022-09-29 15:11:17.764471 [INFO][  APP][00001][upload.go:231]FTP: 10.146.11.63:21 connected.
+2022-09-29 15:11:17.769140 [INFO][  APP][00001][upload.go:250]Ftp Upload: GB004228120CD.jpg success.
+2022-09-29 15:11:17.769140 [INFO][  APP][00001][main.go:97]Program Exit!
+

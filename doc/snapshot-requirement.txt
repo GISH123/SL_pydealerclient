@@ -1,6 +1,6 @@
-
+﻿
 requirement:
-近距离视频(识别用摄像机)中截取一张最合适的jpg图，并上传到FTP server。
+杩戣窛绂昏棰?璇嗗埆鐢ㄦ憚鍍忔満)涓埅鍙栦竴寮犳渶鍚堥€傜殑jpg鍥撅紝骞朵笂浼犲埌FTP server銆?
 
 design:
 1. add field:snapshot_upload_addr into config.xml
@@ -13,11 +13,11 @@ video input: rtmp://g01.jsyihuo.com/tz04/8-4tx for testing purpose.
 new domain addr: rtmp://g01.gyzgyy.cn/tz04/8-4tx
 
 FTP-server:
-内网地址：uatftp.ms359.live:2121
-外网地址：uatimg.ms359.live:10088
+鍐呯綉鍦板潃锛歶atftp.ms359.live:2121
+澶栫綉鍦板潃锛歶atimg.ms359.live:10088
 account: tx / 495992ce9776a80947c01ae200d4a1d4
 
-图片服务器地址：
+鍥剧墖鏈嶅姟鍣ㄥ湴鍧€锛?
 http://uatimg.ms359.live:10088/img/<gmCode>.jpg
 demo-image: http://uatimg.ms359.live:10088/img/GB004228091FW.jpg
 
@@ -25,10 +25,10 @@ demo-image: http://uatimg.ms359.live:10088/img/GB004228091FW.jpg
 2022-08-24 16:15:41.055 [INFO][MainThread] onStartPredict, gmcode=b'GB00622824005\x00', gmstate=2
 2022-08-24 16:16:34.804 [INFO][MainThread] onStopPredict, gmcode=b'GB00622824005\x00', gmstate=0
 
-2022-10-31 13:48:27.248 [INFO][MainThread] SaveFinalResult, gmcode=(b'GB00422A3101S\x00',), len(scanmap)=4  //保存结果
-2022-10-31 13:48:32.237 [INFO][MainThread] datamanager stopPredict, gmcode=, cardcount=0, gmstate=0 //按下确认
-2022-10-31 13:48:56.508 [INFO][MainThread] onStartPredict, gmcode=b'GB00422A3101T\x00', gmstate=2   //开始翻牌时才生成新一个局号
-2022-10-31 13:48:56.714282 [INFO][  APP][00001][upload.go:233]FTP: 192.168.22.40:2121 connected.    //上传截图完成
+2022-10-31 13:48:27.248 [INFO][MainThread] SaveFinalResult, gmcode=(b'GB00422A3101S\x00',), len(scanmap)=4  //淇濆瓨缁撴灉
+2022-10-31 13:48:32.237 [INFO][MainThread] datamanager stopPredict, gmcode=, cardcount=0, gmstate=0 //鎸変笅纭
+2022-10-31 13:48:56.508 [INFO][MainThread] onStartPredict, gmcode=b'GB00422A3101T\x00', gmstate=2   //寮€濮嬬炕鐗屾椂鎵嶇敓鎴愭柊涓€涓眬鍙?
+2022-10-31 13:48:56.714282 [INFO][  APP][00001][upload.go:233]FTP: SNAPSHOT_FTP_HOST:2121 connected.    //涓婁紶鎴浘瀹屾垚
 	def SaveFinalResult(self, gmcode):
 		logger.info('SaveFinalResult, gmcode=%s, len(scanmap)=%d' % (gmcode, len(self.scanmapcard)))
 		self.savetocsv()
@@ -36,5 +36,6 @@ demo-image: http://uatimg.ms359.live:10088/img/GB004228091FW.jpg
 		self.clearCardMap(gmcode)
 
 
-游戏开始局号：GB00422A310O7，结束局号：GB00422B010PT
-能计算出玩了多少局吗
+娓告垙寮€濮嬪眬鍙凤細GB00422A310O7锛岀粨鏉熷眬鍙凤細GB00422B010PT
+鑳借绠楀嚭鐜╀簡澶氬皯灞€鍚?
+

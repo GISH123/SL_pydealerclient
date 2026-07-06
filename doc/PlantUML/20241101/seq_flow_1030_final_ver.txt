@@ -1,5 +1,5 @@
-@startuml
-actor "remoteDealerClient 10.146.11.75" as DC
+﻿@startuml
+actor "remoteDealerClient REMOTE_DEALER_HOST" as DC
 
 box "DealerClient System" /' LightBlue '/
 participant DealerClient as DL /' [dealerclient.py] '/
@@ -34,36 +34,36 @@ DC -> DP: remote sends login message
 DP -> DL: onLoginRet() /' Process login result '/
 
 == Start Card Detection ==
-DC -> DL: send StartPredict封包 to dealerClient /' Request to start detection '/
-DL -> DM: onStartPredict(gmcode,gmstate) dealerClient處理封包訊息後丟入DataManagerInstance
+DC -> DL: send StartPredict灏佸寘 to dealerClient /' Request to start detection '/
+DL -> DM: onStartPredict(gmcode,gmstate) dealerClient铏曠悊灏佸寘瑷婃伅寰屼笩鍏ataManagerInstance
 DM -> VM: self.predictFlag = True /' Set predictFlag to True '/
 
 == Frame Processing and Prediction ==
 loop Until End of Stream
-VM -> VM: retrieve frame from stream 拉流影片 /' Capture frame from video stream '/
+VM -> VM: retrieve frame from stream 鎷夋祦褰辩墖 /' Capture frame from video stream '/
 VM -> VM: process_frame() if self.predictFlag is True/' Start card prediction on the frame '/
 VM -> DET: do_predict_one_label() /' Use detector instance to predict frame '/
 DET -> VM: predict_suits, predict_cardval, score /' return card suits and value, and its confidence score '/
 VM -> DM: send_prediction(add to resultlist) DataMgrInstance().addResultlist() /' prediction added to resultlist, waiting to be responded to remote'/
-VM -> VM: save prediction img to local disk for debugging/retraining if save_predictions(我自訂義的) is True
+VM -> VM: save prediction img to local disk for debugging/retraining if save_predictions(鎴戣嚜瑷傜京鐨? is True
 
-VM -> VM: display_frame() 這邊是顯示在UI的邏輯，包含要偵測的框格，現在要偵測的框格、當前gmcode等/' display current detect situation to the UI window '/
-VM -> VM: drawBestResult2() 存大圖 if save_full_image(我自訂義的) is True /' Draw the best result on the frame. '/
+VM -> VM: display_frame() 閫欓倞鏄’绀哄湪UI鐨勯倧杓紝鍖呭惈瑕佸伒娓殑妗嗘牸锛岀従鍦ㄨ鍋垫脯鐨勬鏍笺€佺暥鍓峠mcode绛?' display current detect situation to the UI window '/
+VM -> VM: drawBestResult2() 瀛樺ぇ鍦?if save_full_image(鎴戣嚜瑷傜京鐨? is True /' Draw the best result on the frame. '/
 end
 
-== DataManager回傳結果給遠端荷官端的處理邏輯 DataMgrInstance().addResultlist() ==
+== DataManager鍥炲偝绲愭灉绲﹂仩绔嵎瀹樼鐨勮檿鐞嗛倧杓?DataMgrInstance().addResultlist() ==
 alt Valid result list
 DM -> DM: addResultlistNoLock(gmcode, resultlist) /' Add results without lock '/
 
 loop for result in resultlist(result = CardInfo)
-DM -> DM: addCardNolock() /' 將CardInfo存成Cardlist形式 , 使用mapcard來辨認是第幾張牌, index 表 第幾張牌 mapcard = {1: cardlist1, 2: cardlist2, 3:cardlist3, ...., 6: cardlist6} '/
+DM -> DM: addCardNolock() /' 灏嘋ardInfo瀛樻垚Cardlist褰㈠紡 , 浣跨敤mapcard渚嗚鲸瑾嶆槸绗咕寮电墝, index 琛?绗咕寮电墝 mapcard = {1: cardlist1, 2: cardlist2, 3:cardlist3, ...., 6: cardlist6} '/
 
-DM -> DM: cardlist.addcardEx(card) /' cardlist長怎樣去看cardlist.py, 大致上來說，就是根據每一張牌位(index)，裡面儲存一個result list,代表該牌位 的 預測結果序列 '/
-DM -> DM: if cardlist.CardNum >= cfg.detecttimes, then check_resultEx() /' 當該牌位的預測牌數 超過detecttimes時(默認為5) '/
-DM -> DM: check_resultEx() -> getsendResultNolock() 判斷發牌，這邊邏輯比較複雜，參考datamanager.py /' getsendResultNolock 當 addCardEx超過次數時(默認10次，代表該牌位儲存的預測結果超過10張時 '/
+DM -> DM: cardlist.addcardEx(card) /' cardlist闀锋€庢ǎ鍘荤湅cardlist.py, 澶ц嚧涓婁締瑾紝灏辨槸鏍规摎姣忎竴寮电墝浣?index)锛岃！闈㈠劜瀛樹竴鍊媟esult list,浠ｈ〃瑭茬墝浣?鐨?闋愭脯绲愭灉搴忓垪 '/
+DM -> DM: if cardlist.CardNum >= cfg.detecttimes, then check_resultEx() /' 鐣惰┎鐗屼綅鐨勯爯娓墝鏁?瓒呴亷detecttimes鏅?榛樿獚鐐?) '/
+DM -> DM: check_resultEx() -> getsendResultNolock() 鍒ゆ柗鐧肩墝锛岄€欓倞閭忚集姣旇純瑜囬洔锛屽弮鑰僤atamanager.py /' getsendResultNolock 鐣?addCardEx瓒呴亷娆℃暩鏅?榛樿獚10娆★紝浠ｈ〃瑭茬墝浣嶅劜瀛樼殑闋愭脯绲愭灉瓒呴亷10寮垫檪 '/
 end
-DM -> DL: senddata(resultlist) 判斷發牌的結果如果有結果，則藉由DealerClient傳到remote荷官端 /' Send processed results back to DealerClient '/
-DL -> DC: sendDetectionResults(bestResult) 藉由DealerClient傳到remote荷官端
+DM -> DL: senddata(resultlist) 鍒ゆ柗鐧肩墝鐨勭祼鏋滃鏋滄湁绲愭灉锛屽墖钘夌敱DealerClient鍌冲埌remote鑽峰畼绔?/' Send processed results back to DealerClient '/
+DL -> DC: sendDetectionResults(bestResult) 钘夌敱DealerClient鍌冲埌remote鑽峰畼绔?
 end
 
 @enduml

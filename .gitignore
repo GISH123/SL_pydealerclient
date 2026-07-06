@@ -1,9 +1,45 @@
-.idea/
+﻿.idea/
+.vscode/
 __pycache__/
+*.py[cod]
+
+# Runtime/output
 audit_images/
-inference_graph/
 log/
 csv/
 predict_images/
+big_images/
+_cuda_stage/
 dist/
 build/
+
+# Local runtime configs
+config.xml
+models/videolist.xml
+doc/model_B04/videolist.xml
+
+# Binaries / installers / generated artifacts
+*.exe
+*.dll
+*.pyd
+*.zip
+*.7z
+*.bundle
+
+# Models / datasets / large media
+*.pb
+*.ckpt*
+*.h5
+*.onnx
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.flv
+models/saved_model/
+models-ref/
+models_*/
+
+# Keep sanitized examples
+!config.example.xml
+!models/videolist.example.xml

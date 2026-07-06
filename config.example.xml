@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<config>
+    <common vid="kkw6_20260426" freq="3" onelabel="1" detecttimes="3" saveimagescore="0.85" />
+    <dealer id="1001" host="127.0.0.1" port="2331" />
+	<!-- <dealer id="1001" host="HOST_PLACEHOLDER" port="2331" /> -->
+    <ftp host="HOST_PLACEHOLDER" port="21" password="FTP_PASSWORD" user="FTP_USER" />
+    <save folder="./big_images" savebigImage="1" />
+    <save_small_image>1</save_small_image>
+	<!-- NEW: loop video after it ends? true/false (or 1/0). Default=true -->
+    <video_loop>1</video_loop>
+
+    <!-- NEW: cap how fast we grab frames from video/stream (0 = unlimited). Typical: 60 -->
+    <max_grab_fps>60</max_grab_fps>
+
+    <!-- NEW: OpenCV capture buffer hint (CAP_PROP_BUFFERSIZE). Typical: 2 -->
+    <cap_buffersize>2</cap_buffersize>
+
+    <stream_publish_fps>60</stream_publish_fps>
+    <stream_drain_grab_max>200</stream_drain_grab_max>
+
+</config>

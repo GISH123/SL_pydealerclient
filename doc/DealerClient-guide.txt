@@ -1,19 +1,19 @@
-# config
+﻿# config
 read_base_config, read_video_list, read_position, read_scoreshold
 AppConfig('./config.xml', './models/videolist.xml','./models/score-threshold.xml')
     ## <common vid="B006" freq="3" onelabel="1" score="0.99" detecttimes="5" saveimagescore="0.85"/>
-    vid: 视频ID
-    freq: 检测FPS
-    onelabel: 1:预测整张牌  0:分别预测花色和牌值
-    score:识别成功的最低分数(比如0.9代表超过0.9才能作为识别成功的依据)
-    detecttimes 每张牌最小预测次数. 多次预测以提高准确度。
-    saveimagescore: 保存image的最低分数值。
+    vid: 瑙嗛ID
+    freq: 妫€娴婩PS
+    onelabel: 1:棰勬祴鏁村紶鐗? 0:鍒嗗埆棰勬祴鑺辫壊鍜岀墝鍊?
+    score:璇嗗埆鎴愬姛鐨勬渶浣庡垎鏁?姣斿0.9浠ｈ〃瓒呰繃0.9鎵嶈兘浣滀负璇嗗埆鎴愬姛鐨勪緷鎹?
+    detecttimes 姣忓紶鐗屾渶灏忛娴嬫鏁? 澶氭棰勬祴浠ユ彁楂樺噯纭害銆?
+    saveimagescore: 淇濆瓨image鐨勬渶浣庡垎鏁板€笺€?
 
     ## <dnn model="./models/model.pb" />
-    训练后输出的模型文件(pb)
+    璁粌鍚庤緭鍑虹殑妯″瀷鏂囦欢(pb)
 
     ## <video vid="B001" gametype="BAC" stream="0" position_file="./models/cap0_pos.xml" width="1920" height="1080" />
-    需要识别的视频信息：vid，game type, stream addr, pos file, input width/height.
+    闇€瑕佽瘑鍒殑瑙嗛淇℃伅锛歷id锛実ame type, stream addr, pos file, input width/height.
     stream="0" is capture id. if config to rtmp://g01.jsyihuo.com/tz04/8-4tx, it is a networking stream uri.
 
     # each card has a threshold like below:
@@ -34,21 +34,22 @@ VideoManager is the video live pipeline.
 
 # test
 video input: rtmp://g01.jsyihuo.com/tz04/8-4tx for testing purpose.
-域名过期，换为--> rtmp://g01.gyzgyy.cn/tz04/8-4tx
+鍩熷悕杩囨湡锛屾崲涓?-> rtmp://g01.gyzgyy.cn/tz04/8-4tx
 
 
-请现场协助我们进行识别程序的测试。
-单独部署一台测试用的识别电脑，硬件/操作系统跟B04生产环境识别用机一样。
-我们的识别程序在增加截图&上传功能后，重新打包发行。通过内网发给现场，由现场帮助测试确认是否运行正常，上传FTP正常。
-修改一下识别软件目录下models\videolist.xml
-    stream="0"改为stream="rtmp://g01.gyzgyy.cn/tz04/8-4tx"
-teamviewer id: 1040425196 , pwd: ummvxv35
-换一台电脑测试通过。
-Techzone_监控值班 (tzcctv)  · i Talk 2022/10/06 16:23:10
+璇风幇鍦哄崗鍔╂垜浠繘琛岃瘑鍒▼搴忕殑娴嬭瘯銆?
+鍗曠嫭閮ㄧ讲涓€鍙版祴璇曠敤鐨勮瘑鍒數鑴戯紝纭欢/鎿嶄綔绯荤粺璺烞04鐢熶骇鐜璇嗗埆鐢ㄦ満涓€鏍枫€?
+鎴戜滑鐨勮瘑鍒▼搴忓湪澧炲姞鎴浘&涓婁紶鍔熻兘鍚庯紝閲嶆柊鎵撳寘鍙戣銆傞€氳繃鍐呯綉鍙戠粰鐜板満锛岀敱鐜板満甯姪娴嬭瘯纭鏄惁杩愯姝ｅ父锛屼笂浼燜TP姝ｅ父銆?
+淇敼涓€涓嬭瘑鍒蒋浠剁洰褰曚笅models\videolist.xml
+    stream="0"鏀逛负stream="rtmp://g01.gyzgyy.cn/tz04/8-4tx"
+remote access credential: <REMOVED>
+鎹竴鍙扮數鑴戞祴璇曢€氳繃銆?
+Techzone_鐩戞帶鍊肩彮 (tzcctv)  路 i Talk 2022/10/06 16:23:10
 1157011002
-Techzone_监控值班 (tzcctv)  · i Talk 2022/10/06 16:23:20
+Techzone_鐩戞帶鍊肩彮 (tzcctv)  路 i Talk 2022/10/06 16:23:20
 fq86z351
 config.xml config as:
-<save folder="Z:" autoUpload="0"/>   //for 共享目录方式
+<save folder="Z:" autoUpload="0"/>   //for 鍏变韩鐩綍鏂瑰紡
 config.xml config as:
-<save folder="./predict_images" autoUpload="1"/>   //for FTP上传方式
+<save folder="./predict_images" autoUpload="1"/>   //for FTP涓婁紶鏂瑰紡
+

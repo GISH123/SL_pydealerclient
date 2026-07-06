@@ -1,52 +1,52 @@
-@startuml
-actor "remoteDealerClient 10.146.11.75" as DC
+﻿@startuml
+actor "remoteDealerClient REMOTE_DEALER_HOST" as DC
 
-box "Card Detection Adding to ResultList and return to remote Dealer 發牌邏輯" 
+box "Card Detection Adding to ResultList and return to remote Dealer 鐧肩墝閭忚集" 
 participant CardManager as CM /' [CardManager.cpp] '/
 participant CardList as CL /' [CardList.cpp] '/
 participant CardInfo as CI /' [CardInfo.cpp] '/
 end box
 
-== addResultList, 辨識完後，將卡牌加入六個牌框，作為回傳荷官端的最終結果之候選 ==
-loop uList (a uList means a result from detector, usually len=1) 一般為一個卡牌的結果 /' for (auto it = uList.begin(); it != uList.end(); ++it) '/
-CM -> CM: CardManager.uItem = CardManager.m_uMap.find(ulist.index)\n uItem為一個牌框的東西
+== addResultList, 杈ㄨ瓨瀹屽緦锛屽皣鍗＄墝鍔犲叆鍏€嬬墝妗嗭紝浣滅偤鍥炲偝鑽峰畼绔殑鏈€绲傜祼鏋滀箣鍊欓伕 ==
+loop uList (a uList means a result from detector, usually len=1) 涓€鑸偤涓€鍊嬪崱鐗岀殑绲愭灉 /' for (auto it = uList.begin(); it != uList.end(); ++it) '/
+CM -> CM: CardManager.uItem = CardManager.m_uMap.find(ulist.index)\n uItem鐐轰竴鍊嬬墝妗嗙殑鏉辫タ
 
 note right
-CardManager.m_uMap = {card.index : CardList}, key對應六個牌框, value對應6個牌框的容器CardList 
+CardManager.m_uMap = {card.index : CardList}, key灏嶆噳鍏€嬬墝妗? value灏嶆噳6鍊嬬墝妗嗙殑瀹瑰櫒CardList 
 end note
 
 CM -> CM: CardList.addCard(CardManager.uItem)
 
-alt CardManager.uItem為空 (Scenario 1)
-    CM -> CL: CardList uListItem; uListItem.addCard(*it); m_uMap[it->m_nInx] = uListItem; \n新增Cardlist uListItem 做為此牌框的容器
-else CardManager.uItem有值 (Scenario 2)
-    CM -> CM: uItem->second.addCard(*it); 在該index上的CardManager.CardList新增卡牌
-    CM -> CL: 並於該預測的classid上(uListItem.m_uMap)去加牌
+alt CardManager.uItem鐐虹┖ (Scenario 1)
+    CM -> CL: CardList uListItem; uListItem.addCard(*it); m_uMap[it->m_nInx] = uListItem; \n鏂板Cardlist uListItem 鍋氱偤姝ょ墝妗嗙殑瀹瑰櫒
+else CardManager.uItem鏈夊€?(Scenario 2)
+    CM -> CM: uItem->second.addCard(*it); 鍦ㄨ┎index涓婄殑CardManager.CardList鏂板鍗＄墝
+    CM -> CL: 涓︽柤瑭查爯娓殑classid涓?uListItem.m_uMap)鍘诲姞鐗?
 end
 
 note right
-CardList.m_uMap = {classid : list of CardInfos}, key為m_nCardVal, value為一個單純的vector裡面裝預測的牌CardInfos 
+CardList.m_uMap = {classid : list of CardInfos}, key鐐簃_nCardVal, value鐐轰竴鍊嬪柈绱旂殑vector瑁￠潰瑁濋爯娓殑鐗孋ardInfos 
 end note
 
 CL -> CL: CardList.addCard(CardInfo uCard), CardList.uItem = CardList.m_uMap.find(uCard.m_nCardVal);
-alt (Scenario 1) CardList.uItem為空,該classid沒有預測到
-CL -> CL: 新增CardList.uList，在此uList新增此張卡牌，並以classid當key去新增到CardList.m_uMap
-else (Scenario 2) CardList.uItem有值,該classid已存在一張牌
-CL -> CL: 在此uItem(m_uMap對應的classid之CardInfos)新增卡牌
+alt (Scenario 1) CardList.uItem鐐虹┖,瑭瞔lassid娌掓湁闋愭脯鍒?
+CL -> CL: 鏂板CardList.uList锛屽湪姝List鏂板姝ゅ嫉鍗＄墝锛屼甫浠lassid鐣秌ey鍘绘柊澧炲埌CardList.m_uMap
+else (Scenario 2) CardList.uItem鏈夊€?瑭瞔lassid宸插瓨鍦ㄤ竴寮电墝
+CL -> CL: 鍦ㄦuItem(m_uMap灏嶆噳鐨刢lassid涔婥ardInfos)鏂板鍗＄墝
 end
 
-CL -> CM: if (uItem->second.GetNum() >= m_pConfig->m_uBase.m_DetecTime)\n最後將該牌框上，現在有的牌框數量做判斷
-CM -> CM: 當牌框數量超過detecttimes，則進入挑牌回傳邏輯CheckResultEx()
+CL -> CM: if (uItem->second.GetNum() >= m_pConfig->m_uBase.m_DetecTime)\n鏈€寰屽皣瑭茬墝妗嗕笂锛岀従鍦ㄦ湁鐨勭墝妗嗘暩閲忓仛鍒ゆ柗
+CM -> CM: 鐣剁墝妗嗘暩閲忚秴閬巇etecttimes锛屽墖閫插叆鎸戠墝鍥炲偝閭忚集CheckResultEx()
 end
 
-== CheckResultEx(), 根據現有的牌框之預測結果，做挑選邏輯，選最好的牌回傳荷官端 ==
-CM -> CM: 確認此牌框是否已發牌，已發牌就不做事
-alt (Scenario 1) nCount牌框的牌數量 >= nCount_GoodSamples==5
-CM -> CL: getbestcard(), 取眾數邏輯，以分數為基底去挑一張最適合回傳荷官端的牌，詳情看code，裡面有依信心分數排序
-else (Scenario 2) nCount >= detectimes 且為3或4
-CM -> CM: getSendResultList，取牌框第二張卡，<color:teal>我的理解是這邊沒有排序?(所以不會取第二高分?)
-else (Scenario 3) 以上都沒發生的情況，且ncount介於2和5之間
-CM -> CM: 2024.12.18 以現版本 還是取眾數getbestcard(), mincount設為2代表同一classid至少要有兩張牌
+== CheckResultEx(), 鏍规摎鐝炬湁鐨勭墝妗嗕箣闋愭脯绲愭灉锛屽仛鎸戦伕閭忚集锛岄伕鏈€濂界殑鐗屽洖鍌宠嵎瀹樼 ==
+CM -> CM: 纰鸿獚姝ょ墝妗嗘槸鍚﹀凡鐧肩墝锛屽凡鐧肩墝灏变笉鍋氫簨
+alt (Scenario 1) nCount鐗屾鐨勭墝鏁搁噺 >= nCount_GoodSamples==5
+CM -> CL: getbestcard(), 鍙栫溇鏁搁倧杓紝浠ュ垎鏁哥偤鍩哄簳鍘绘寫涓€寮垫渶閬╁悎鍥炲偝鑽峰畼绔殑鐗岋紝瑭虫儏鐪媍ode锛岃！闈㈡湁渚濅俊蹇冨垎鏁告帓搴?
+else (Scenario 2) nCount >= detectimes 涓旂偤3鎴?
+CM -> CM: getSendResultList锛屽彇鐗屾绗簩寮靛崱锛?color:teal>鎴戠殑鐞嗚В鏄€欓倞娌掓湁鎺掑簭?(鎵€浠ヤ笉鏈冨彇绗簩楂樺垎?)
+else (Scenario 3) 浠ヤ笂閮芥矑鐧肩敓鐨勬儏娉侊紝涓攏count浠嬫柤2鍜?涔嬮枔
+CM -> CM: 2024.12.18 浠ョ従鐗堟湰 閭勬槸鍙栫溇鏁竒etbestcard(), mincount瑷偤2浠ｈ〃鍚屼竴classid鑷冲皯瑕佹湁鍏╁嫉鐗?
 
 end
 

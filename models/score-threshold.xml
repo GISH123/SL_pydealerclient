@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <pukes>
 	<puke>
+		<title>cardback</title>
+		<index>0</index>
+		<threshold>0.9</threshold>
+	</puke>
+	<puke>
 		<title>club_ace</title>
 		<index>1</index>
 		<threshold>0.9</threshold>

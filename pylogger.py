@@ -1,8 +1,16 @@
 # encoding=utf-8
 
 import os
+import sys
 import datetime as d
 import threading, time
+
+# --- make console prints UTF-8 if possible (no behavior change if it fails) ---
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 class PyLogger(object):
     def __init__(self, dir):
@@ -16,14 +24,15 @@ class PyLogger(object):
             os.mkdir(self.curDir)
 
         self.filename = self.curDir + '/' + self.curFileName()
-        self.file = open(self.filename, 'a+')
+        # *** only change: force UTF-8 for the log file ***
+        self.file = open(self.filename, 'a+', encoding='utf-8', errors='replace')
 
-        # 启动日志记录线程
-        #self.thread = threading.Thread(target=self.run)
-        #self.msgqueue = []
-        #self.thread.start()
-        #self.lock = threading.Lock()
-        #self._stop_event = threading.Event()
+        # # 啟動日誌記錄線程（保留你的註解與行為）
+        # self.thread = threading.Thread(target=self.run)
+        # self.thread.start()
+        # self.msgqueue = []
+        # self.lock = threading.Lock()
+        # self._stop_event = threading.Event()
 
     def stop(self):
         self.file.close()
@@ -45,12 +54,13 @@ class PyLogger(object):
 
         newfile = self.curDir + '/' + self.curFileName()
         if self.filename != newfile:
-            # 先关闭原来的文件
+            # 先關閉原來的文件
             if not self.file.closed:
                 self.file.close()
 
             self.filename = newfile
-            self.file = open(self.filename, 'a+')
+            # *** only change: force UTF-8 for the new file too ***
+            self.file = open(self.filename, 'a+', encoding='utf-8', errors='replace')
 
         if not self.file.closed and self.file.writable():
             self.file.write(message)
@@ -66,48 +76,48 @@ class PyLogger(object):
             self.msgqueue = []
             self.lock.release()
 
-
     def fmt_str(self, level, message):
         threadid = threading.current_thread().name
         curTime = d.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-        str = '%s [%s][%s] %s' % (curTime, level, threadid, message)
-        return str
+        s = '%s [%s][%s] %s' % (curTime, level, threadid, message)
+        return s
 
     def post(self, message):
         '''
-        将数据添加至队列
         :param message:
         :return:
         '''
+        # 保留原本行為（直接寫檔）
         self.write(message)
-        #self.lock.acquire()
-        #self.msgqueue.append(message)
-        #self.lock.release()
+        # self.lock.acquire()
+        # self.msgqueue.append(message)
+        # self.lock.release()
 
     def info(self, message):
-        str = self.fmt_str('INFO', message)
-        print(str)
-        str += '\n'
-        self.post(str)
+        s = self.fmt_str('INFO', message)
+        print(s)            # console print (now UTF-8 safe if reconfigure succeeded)
+        s += '\n'
+        self.post(s)
 
     def debug(self, message):
-        str = self.fmt_str('DEBUG', message)
-        print(str)
-        str += '\n'
-        self.post(str)
+        s = self.fmt_str('DEBUG', message)
+        print(s)
+        s += '\n'
+        self.post(s)
 
     def warning(self, message):
-        str = self.fmt_str('WARNING', message)
-        print(str)
-        str += '\n'
-        self.post(str)
+        s = self.fmt_str('WARNING', message)
+        print(s)
+        s += '\n'
+        self.post(s)
 
     def error(self, message):
-        str = self.fmt_str('ERR', message)
-        print(str)
-        str += '\n'
-        self.post(str)
+        s = self.fmt_str('ERR', message)
+        print(s)
+        s += '\n'
+        self.post(s)
 
+# 保留原有對外接口
 log = PyLogger('./log')
 
 def info(message):

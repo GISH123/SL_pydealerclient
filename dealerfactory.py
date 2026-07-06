@@ -33,7 +33,7 @@ class DealerFactory(protocol.ClientFactory):
 
     def sendData(self, data):
         if self.protocol:
-            logger.info('dealer factory, sendData, len=%d' % (len(data)))
+            # logger.info('dealer factory, sendData, len=%d' % (len(data)))
             self.protocol.sendData(data)
 
 

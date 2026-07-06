@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<config>
+  <!--模锟斤拷锟斤拷锟斤拷锟侥硷拷-->
+  <dnn model="./models/saved_model"/>
+
+  <videolist>
+    <video vid="B022t" gametype="NN"  stream="./models/video_NN.mp4" position_file="./models/cap0_pos_testdesk_NN.xml" width="1920" height="1080"/>
+    <video vid="B001t" gametype="BAC" stream="rtmp://STREAM_HOST/app/stream" position_file="./models/cap0_pos_testdesk_BAC.xml" width="1920" height="1080"/>
+    <video vid="B004t" gametype="BAC"  stream="./models/video_BAC.mp4" position_file="./models/cap0_pos_testdesk_BAC.xml" width="1920" height="1080"/>
+    <video vid="B004" gametype="BAC" stream="rtmp://STREAM_HOST/app/stream" position_file="./models/cap0_pos_B04.xml" width="1920" height="1080"/>
+	<video vid="BINGO" gametype="BAC" stream="rtmp://STREAM_HOST/app/stream" position_file="./models/cap0_pos_BINGO.xml" width="640" height="360"/>
+	<video vid="BINGOt" gametype="BAC" stream="./models/video_BINGO.mp4" position_file="./models/cap0_pos_BINGO.xml" width="640" height="360"/>
+	<video vid="S001t" gametype="BAC" stream="./models/video_spain.avi" position_file="./models/cap0_pos_testdesk_SPAIN.xml" width="1280" height="720"/>
+	<!-- <video vid="tilt_angle" gametype="BAC" stream="rtmp://STREAM_HOST/app/stream" position_file="./models/cap0_pos_tilt_angle.xml" width="1280" height="720"/> -->
+	<video vid="tilt_angle" gametype="BAC" stream="rtmp://STREAM_HOST/app/stream" position_file="./models/uk_6_cards_annotations.xml" width="1280" height="720"/>
+	<!-- <video vid="tilt_angle" gametype="BAC" stream="./models/uk_100m.mp4" position_file="./models/cap0_pos_tilt_angle.xml" width="1280" height="720"/> -->
+	<!-- <video vid="tilt_angle" gametype="BAC" stream="./models/uk_59m.mp4" position_file="./models/cap0_pos_tilt_angle.xml" width="1280" height="720"/> -->
+	<video vid="uk_35m_front_valid" gametype="BAC"  stream="rtmp://STREAM_HOST/app/stream" position_file="./models/uk_35m_front_valid.xml" width="1920" height="1080"/>
+  <video vid="uk_6_cards" gametype="BAC"  stream="rtmp://STREAM_HOST/app/stream" position_file="./models/uk_6_cards_annotations.xml" width="1920" height="1080"/>
+  <video vid="ph_bac" gametype="BAC"  stream="./models/ph_bac.mp4" position_file="./models/ph_bac_pretrain_1.xml" width="3840" height="2160"/>
+  <video vid="DT_bac" gametype="DT"  stream="./models/ph_bac.mp4" position_file="./models/dragontiger_test.xml" width="3840" height="2160"/>
+  <video vid="DT_bac_test" gametype="DT"  stream="./models/test_30m.mp4" position_file="./models/test30m_middle_top_bottom.xml" width="1920" height="1080"/>
+  <video vid="DT_bac_recrop1" gametype="DT"  stream="./models/20250809_BAC_1.mp4" position_file="./models/BAC_1_recrop.xml" width="1920" height="1080"/>
+  <video vid="DT_bac_recrop2" gametype="DT"  stream="./models/20250809_BAC_2.mp4" position_file="./models/BAC_2_recrop.xml" width="1920" height="1080"/>
+  <video vid="DT_bac_recrop3" gametype="DT"  stream="./models/20250809_BAC_3.mp4" position_file="./models/BAC_3_recrop.xml" width="1920" height="1080"/>
+  <video vid="DT_bac_recrop4" gametype="DT"  stream="./models/20250809_BAC_4.mp4" position_file="./models/BAC_4_recrop.xml" width="1920" height="1080"/>
+  <video vid="DT_bac_0916" gametype="DT"  stream="./models/test_30m.mp4" position_file="./models/test30m_6index.xml" width="1920" height="1080"/>
+  <video vid="DT_A0061" gametype="DT"  stream="./models/0923A0061.mp4" position_file="./models/A0061_dragon_2.xml" width="1920" height="1080"/>
+  <!-- <video vid="DT_A0062" gametype="DT"  stream="./models/0923A0062.mp4" position_file="./models/A0061_dragon_2.xml" width="1920" height="1080"/> -->
+  <video vid="DT_A0062" gametype="DT"  stream="rtmp://STREAM_HOST/app/stream" position_file="./models/A0061_dragon_2.xml" width="1920" height="1080"/>
+  <video vid="DT_A0063" gametype="DT"  stream="./models/0923A0063.mp4" position_file="./models/A0061_dragon_2.xml" width="1920" height="1080"/>
+  <video vid="DT_retrain_40m" gametype="DT"  stream="./models/20251023_DT_100min.mp4" position_file="./models/20251021_DT_retrain.xml" width="1920" height="1080"/>
+  <video vid="DT_online" gametype="DT"  stream="rtmp://STREAM_HOST/app/stream" position_file="./models/DT_online.xml" width="1920" height="1080"/>
+  <video vid="DT_online_100m" gametype="DT"  stream="rtmp://STREAM_HOST/app/stream" position_file="./models/DT_online.xml" width="1920" height="1080"/>
+  <video vid="DT_online_鐝惧牬" gametype="DT"  stream="rtmp://STREAM_HOST/app/stream" position_file="./models/DT_livestream_1.xml" width="1920" height="1080"/>
+  <video vid="latency" gametype="lattest"  stream="./models/dt_25m.mp4" position_file="./models/DT_livestream_1.xml" width="1920" height="1080"/>
+  <video vid="latency_online" gametype="lattest"  stream="rtmp://STREAM_HOST/app/stream" position_file="./models/DT_livestream_1.xml" width="1920" height="1080"/>
+  <video vid="kkw" gametype="BAC"  stream="rtmp://STREAM_HOST/app/stream" position_file="./models/kkw1.xml" width="1920" height="1080"/>
+  <video vid="kkw6" gametype="lattest"  stream="https://STREAM_HOST/path/video.flv" position_file="./models/kkw1.xml" width="1920" height="1080"/>
+  <video vid="kkw6_20260426" gametype="lattest"  stream="https://STREAM_HOST/path/video.flv" position_file="./models/kkw6_20260426.xml" width="1920" height="1080"/>
+  </videolist>
+</config>
+

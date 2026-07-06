@@ -51,7 +51,7 @@ class DealerProtocol(protocol.Protocol):
             #解压报文头
             head = self.cache[:cardmsg.CMD_HEAD_LEN]
             cmd, size, seq = struct.unpack('!IiI', head)
-            logger.info('dataReceived, cmd=%s, size=%s, seq=%s' % (hex(cmd), size, seq))
+            # logger.info('dataReceived, cmd=%s, size=%s, seq=%s' % (hex(cmd), size, seq))
 
             # 数据没有接受完整
             if size > 0 and len(self.cache) < size:
@@ -59,7 +59,7 @@ class DealerProtocol(protocol.Protocol):
 
             # 解压报文
             body = self.cache[cardmsg.CMD_HEAD_LEN:size]
-            logger.info('dataReceived, cmd=%s seq=%s body=%s' % (hex(cmd), seq, body))
+            # logger.info('dataReceived, cmd=%s seq=%s body=%s' % (hex(cmd), seq, body))
             self._handleCmd(cmd, seq, body)
             self.cache = self.cache[size::]
 

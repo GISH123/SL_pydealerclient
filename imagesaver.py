@@ -138,7 +138,7 @@ class ImageSaver(object):
         # 20240919 .strftime('%Y%m%d%H%M%S%f_') 改為 .strftime('%Y%m%d%H%M_')，以分鐘為單位保存圖片，不然同張卡牌惠存一堆圖片
         filepath = os.path.join(gmcode_dir, filename)
 
-        logger.info('write, image file path =%s' % (filepath))
+        # logger.info('write, image file path =%s' % (filepath))
 
         # Add the image node to the save queue
         node = ImageFileNode(filename, filepath, image, fmt_str)

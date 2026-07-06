@@ -1,5 +1,5 @@
-@startuml
-actor "remoteDealerClient 10.146.11.75" as DC
+﻿@startuml
+actor "remoteDealerClient REMOTE_DEALER_HOST" as DC
 box "pydealerMain [main.pyw]" #LightBlue
     participant DealerClient as DL /' [dealerclient.py] '/
     participant VideoManager as VM /' [videomanager.py] '/
@@ -8,7 +8,7 @@ box "pydealerMain [main.pyw]" #LightBlue
     participant DataManager as DM /' [datamanager.py] '/
 end box
 
-DC -> DL: Establish connection (IP 10.146.11.75)
+DC -> DL: Establish connection (IP REMOTE_DEALER_HOST)
 DL -> DC: Confirm connection
 
 DC -> DL: Request card detection

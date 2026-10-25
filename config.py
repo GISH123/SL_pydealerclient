@@ -2,6 +2,10 @@
 
 import xml.dom.minidom as xmldom
 import pylogger as logger
+from model_class_mapping import (
+    default_mapping_mode_for_gametype,
+    normalize_mapping_mode,
+)
 
 TRY_CONNECT_DEALER_SECOND = 10
 TRY_CONNECT_DEVMGR_SECOND = 10
@@ -54,6 +58,16 @@ class AppConfig(object):
             logger.error('load_video_list %s failed' % (self.video_filename))
             return False
 
+        # Resolve mapping only after gametype is known.
+        # BAC/DT default: current 0..52,99 folders trained with legacy string sort.
+        # lattest default: preserve existing 3-class identity mapping.
+        default_mapping_mode = default_mapping_mode_for_gametype(self.gametype)
+        self.model_class_mapping_mode = normalize_mapping_mode(
+            getattr(self, '_model_class_mapping_mode_config', None),
+            default_mapping_mode,
+        )
+        logger.info('model_class_mapping_mode=%s' % self.model_class_mapping_mode)
+
         bRet = self.read_position(self.position_filename)
         if not bRet:
             logger.error('read_position %s failed' % (self.position_filename))
@@ -95,6 +109,12 @@ class AppConfig(object):
         self.onelabel = int(node_common.getAttribute('onelabel'))
         self.detecttimes = int(node_common.getAttribute('detecttimes'))
         self.saveimagescore = float(node_common.getAttribute('saveimagescore'))
+
+        # Optional model output-index mapping mode. Resolve after video list
+        # is loaded because the safe default depends on gametype.
+        self._model_class_mapping_mode_config = _get_text(
+            root, 'model_class_mapping_mode'
+        )
 
         # <dealer ... />
         node_dealer = root.getElementsByTagName('dealer')[0]

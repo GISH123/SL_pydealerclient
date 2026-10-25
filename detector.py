@@ -13,10 +13,17 @@ import numpy as np
 import cv2
 from prepare_data import load_and_preprocess_image
 from prepare_data_jk import load_and_preprocess_image as load_and_preprocess_image_jk
+from model_class_mapping import (
+    default_mapping_mode_for_gametype,
+    model_idx_to_predict_classid,
+    read_mapping_mode_from_config,
+)
 
 class Detector(object):
     def __init__(self):
         logger.info('Detector constructed...')
+        self.model_class_mapping_mode = cfg.model_class_mapping_mode
+        logger.info(f'Model class mapping mode: {self.model_class_mapping_mode}')
         gpus = tf.config.list_physical_devices('GPU')
         logger.info(f"Detector tf list_physical_devices: {gpus}")
         gpu = next(iter(tf.config.list_physical_devices('GPU')), None)
@@ -88,15 +95,16 @@ class Detector(object):
         # ───────────────────────────────────────────────────────────────────
 
         confidence = np.array(tf.math.abs(pred).numpy()).max()
-        idx = tf.math.argmax(pred, axis=-1).numpy()[0]
+        model_idx = int(tf.math.argmax(pred, axis=-1).numpy()[0])
+        classid = model_idx_to_predict_classid(model_idx, self.model_class_mapping_mode)
 
-        # Log one compact line with inference cost
+        # Log both namespaces so model output and pydealer predict_classid are auditable.
         logger.info(f'[INFER] {self.gpu_name} gmcode={gmcode} index={index} frame_id={frame_id} '
-                    f'classid={int(idx)} conf={float(confidence):.4f}, do_predict_one_label prediction finished, span={time_end_time - time_start_time})')
+                    f'model_idx={model_idx} predict_classid={classid} mapping={self.model_class_mapping_mode} '
+                    f'conf={float(confidence):.4f}, do_predict_one_label prediction finished, span={time_end_time - time_start_time})')
         
 
-        score = pred[0][idx]
-        classid = idx
+        score = pred[0][model_idx]
         box = [0,1,2,3]
 
         # 20240827 rotation path is unused in current pipeline (rotation=False)
@@ -218,14 +226,15 @@ class Detector(object):
         # ───────────────────────────────────────────────────────────────────
 
         confidence = np.array(tf.math.abs(pred).numpy()).max()
-        idx = tf.math.argmax(pred, axis=-1).numpy()[0]
+        model_idx = int(tf.math.argmax(pred, axis=-1).numpy()[0])
+        classid = model_idx_to_predict_classid(model_idx, self.model_class_mapping_mode)
 
-        # Log one compact line with inference cost
+        # Log both namespaces so model output and pydealer predict_classid are auditable.
         logger.info(f'[INFER] {self.gpu_name} gmcode={gmcode} index={index} frame_id={frame_id} '
-                    f'classid={int(idx)} conf={float(confidence):.4f}, do_predict_one_label prediction finished, model_predict_span={time_end_time - time_start_time}')
+                    f'model_idx={model_idx} predict_classid={classid} mapping={self.model_class_mapping_mode} '
+                    f'conf={float(confidence):.4f}, do_predict_one_label prediction finished, model_predict_span={time_end_time - time_start_time}')
 
-        score = pred[0][idx]
-        classid = idx
+        score = pred[0][model_idx]
         box = [0,1,2,3]
 
         # 20240827 rotation path is unused in current pipeline (rotation=False)

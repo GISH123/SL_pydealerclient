@@ -6,6 +6,13 @@
     <ftp host="HOST_PLACEHOLDER" port="21" password="FTP_PASSWORD" user="FTP_USER" />
     <save folder="./big_images" savebigImage="1" />
     <save_small_image>1</save_small_image>
+
+    <!-- Model output index -> pydealer predict_classid mapping.
+         Normal BAC/DT default when omitted: numeric_folder_lexicographic
+         (current 0..52,99 dataset + existing Training Tool string-sort behavior).
+         lattest default when omitted: legacy_identity, preserving its 3-class model.
+         This example uses a lattest VID, so keep legacy_identity explicitly. -->
+    <model_class_mapping_mode>legacy_identity</model_class_mapping_mode>
 	<!-- NEW: loop video after it ends? true/false (or 1/0). Default=true -->
     <video_loop>1</video_loop>
 

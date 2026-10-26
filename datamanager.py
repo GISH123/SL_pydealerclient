@@ -9,6 +9,7 @@ from twisted.internet.task import LoopingCall
 from config import cfg
 from collections import defaultdict
 
+
 class DataManager(object):
 	def __init__(self):
 		'''
@@ -68,11 +69,14 @@ class DataManager(object):
 	# 使其他Instance能使用datamanager去傳送資料使用，如dealerclient.py DataMgrInstance().register_senddata(self.sendPredictResult)
 	def register_senddata(self, senddata):
 		self.senddata = senddata
+
 	def register_ImageSaver(self, imageSaver):
 		self.imageSaver = imageSaver
+
 	def notify_ImageSaver(self):
 		if self.imageSaver:
 			self.imageSaver.setSnapshotFlag()
+
 	# ==========================================================================================================================
 	# 取得當前最佳結果使用 - return 6個格子的list，每個格子有當前最佳預測結果
 	# def getBestResultlist(self, gmcode, minCardCount):
@@ -114,18 +118,99 @@ class DataManager(object):
 		else:
 			logger.error('addResultlist invalid, len=0, gmcode=%s' % (gmcode))
 
+	def _passes_vote_threshold(self, result):
+		"""
+		BAC / DT voting gate.
+
+		Only predictions whose score reaches the configured per-class threshold
+		are allowed into Cardlist_box. This makes cfg.detecttimes mean the number
+		of ACCEPTED predictions, not the number of raw inference attempts.
+
+		Important namespace rule:
+		- cfg.scoremap is keyed by pydealer predict_classid (score-threshold.xml)
+		- result.predict_classid is therefore the lookup key
+		- result.dealer_classid must NOT be used for this threshold lookup
+
+		lattest and other legacy game modes keep their previous behavior.
+		"""
+		if self.gmtype not in ('BAC', 'DT'):
+			return True
+
+		try:
+			predict_classid = int(result.predict_classid)
+			score = float(result.score)
+		except Exception as e:
+			logger.error(
+				'[VOTE_REJECT] invalid CardInfo, gmtype=%s, index=%s, error=%s' % (
+					self.gmtype,
+					getattr(result, 'index', None),
+					e,
+				)
+			)
+			return False
+
+		threshold = cfg.scoremap.get(predict_classid)
+		if threshold is None:
+			logger.error(
+				'[VOTE_REJECT] threshold missing, gmtype=%s, index=%s, predict_classid=%d, score=%.4f' % (
+					self.gmtype,
+					getattr(result, 'index', None),
+					predict_classid,
+					score,
+				)
+			)
+			return False
+
+		threshold = float(threshold)
+		if score < threshold:
+			logger.info(
+				'[VOTE_REJECT] gmtype=%s, index=%d, predict_classid=%d, dealer_classid=%s, score=%.4f, threshold=%.4f' % (
+					self.gmtype,
+					int(result.index),
+					predict_classid,
+					getattr(result, 'dealer_classid', None),
+					score,
+					threshold,
+				)
+			)
+			return False
+
+		logger.info(
+			'[VOTE_ACCEPT] gmtype=%s, index=%d, predict_classid=%d, dealer_classid=%s, score=%.4f, threshold=%.4f' % (
+				self.gmtype,
+				int(result.index),
+				predict_classid,
+				getattr(result, 'dealer_classid', None),
+				score,
+				threshold,
+			)
+		)
+		return True
+
 	def addResultlistNoLock(self, gmcode, resultlist):
 		if gmcode == self.gmcode and self.predictFlag:
 			self.isDirty = True
 			for result in resultlist:
+				# BAC / DT: only threshold-qualified predictions count toward detecttimes
+				# and participate in bestcardEx() voting.
+				if not self._passes_vote_threshold(result):
+					continue
+
 				# 每次在这里检查是否该发，如果发了就在这里退出
 				self.addCardNolock(result.index, result)
 				# logger.info('addResultlist, gmcode=%s, index=%d, value=%d' % (gmcode, result.index, result.dealer_classid))
 				cardlist_box = self.mapcard.get(result.index)
-				# 如果大于等于cfg.detecttimes(以前5)张牌了就判断是否可发
+				# 如果大于等于cfg.detecttimes(以前5)张合格牌了就判断是否可发
 				if cardlist_box is not None:
 					if cardlist_box.CardNum >= cfg.detecttimes:
-						# logger.info('addResultlist, gmcode=%s, [%d]cardlist.CardNum=%d' % (gmcode, result.index, cardlist_box.CardNum))
+						logger.info(
+							'[VOTE_READY] gmtype=%s, index=%d, accepted=%d, detecttimes=%d' % (
+								self.gmtype,
+								int(result.index),
+								int(cardlist_box.CardNum),
+								int(cfg.detecttimes),
+							)
+						)
 						self.check_resultEx(result.index, cardlist_box.CardNum)
 
 	def addCardNolock(self, index, card):
@@ -498,7 +583,9 @@ class DataManager(object):
 			elif index == 6:
 				self.curcardlist.append(6)
 
+
 dataMgr = DataManager()
+
 
 def DataMgrInstance():
 	return dataMgr
